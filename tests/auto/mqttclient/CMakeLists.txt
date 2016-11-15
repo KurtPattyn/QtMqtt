@@ -1,0 +1,4 @@
+
+add_qt_test(qmqttnetworkrequest tst_qmqttnetworkrequest.cpp)
+add_qt_test(qmqttprotocol tst_qmqttprotocol.cpp)
+add_private_qt_test(qmqttcontrolpacket tst_qmqttcontrolpacket.cpp)
