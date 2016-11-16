@@ -101,11 +101,7 @@ QT_BEGIN_NAMESPACE
  */
 void setTimeout(std::function<void()> f, int ms)
 {
-    QTimer *t = new QTimer;
-    t->setInterval(ms);
-    t->setSingleShot(true);
-    QObject::connect(t, &QTimer::timeout, f);
-    t->start();
+    QTimer::singleShot(ms, f);
 }
 
 /*!
