@@ -48,7 +48,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
 
 # Create config file
-configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in
+configure_package_config_file(cmake/config.cmake.in
   ${CMAKE_BINARY_DIR}/${CMAKE_CONFIG_FILE_BASE_NAME}Config.cmake
   INSTALL_DESTINATION ${CMAKE_BINARY_DIR}
   PATH_VARS INCLUDE_INSTALL_DIR
