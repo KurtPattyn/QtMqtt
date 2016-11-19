@@ -17,32 +17,39 @@ Check out the sources.
 In a terminal go to the directory where the sources are installed.
 
 Create build directory
+
 `mkdir build`
 
 Go into the build directory
+
 `cd build`
 
 Create the build files
+
 `cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..`
 
 To make a release build, change `-DCMAKE_BUILD_TYPE=debug` to `-DCMAKE_BUILD_TYPE=release`
+
 To make a dynamic library, change `-DBUILD_SHARED_LIBS=OFF` to `-DBUILD_SHARED_LIBS=ON`
 
 Build the library
+
 `make`
 
 Execute unit tests
+
 `make test`
 
 To enable testing of internal code, add `-DPRIVATE_TESTS_ENABLED` (default: OFF) to the `cmake` command line.
 
 Install the library
+
 `make install`
 
 Usage
 =====
 Include the following in your `CMakeLists.txt` file
-```
+```CMake
 find_package(Qt5Mqtt)
 
 target_link_libraries(<target> Qt5::Mqtt)
