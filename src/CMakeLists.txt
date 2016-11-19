@@ -17,6 +17,7 @@ set(${TARGET_NAME}_PRIVATE_HEADERS
     qmqttclient_p.h
     qmqttcontrolpacket_p.h
     qmqttpacketparser_p.h
+    logging_p.h
 )
 
 # will be a static or dynamic library based on the setting of BUILD_SHARED_LIBS

@@ -8,6 +8,10 @@
 #include <QDebug>
 #include <QMetaEnum>
 
+#include "logging_p.h"
+
+LoggingModule("QMqttPacketParser");
+
 class MQTTPacket
 {
 public:
@@ -64,6 +68,7 @@ private:
     static bool parseHeader(QBuffer &buffer, MQTTPacket &packet);
     static bool parseRemainingLength(QBuffer &buffer, MQTTPacket &packet);
 };
+
 MQTTPacket MQTTPacket::readPacket(const QByteArray &data)
 {
     MQTTPacket packet;
@@ -173,15 +178,10 @@ void QMqttPacketParser::parse(const QByteArray &packet)
         const QString errorMessage = QStringLiteral("Error reading packet: %1 (%2).")
                 .arg(toString(mqttPacket.error()))
                 .arg(mqttPacket.errorString());
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
-//    qDebug() << "Command:" << mqttPacket.packetType()
-//             << "retain:" << mqttPacket.retain()
-//             << "qos:" << mqttPacket.qos()
-//             << "dup:" << mqttPacket.dup()
-//             << "payload:" << mqttPacket.payload();
 
     switch (mqttPacket.packetType()) {
         case QMqttControlPacket::PacketType::CONNACK: {
@@ -220,7 +220,7 @@ void QMqttPacketParser::parse(const QByteArray &packet)
 
         case QMqttControlPacket::PacketType::PUBREC:
         case QMqttControlPacket::PacketType::PUBCOMP: {
-            qWarning() << "PUBREC and PUBCOMP is not supported currently.";
+            qCWarning(module) << "PUBREC and PUBCOMP is not supported currently.";
             break;
         }
 
@@ -235,7 +235,7 @@ void QMqttPacketParser::parse(const QByteArray &packet)
         }
 
         default: {
-            qWarning() << "Unhandled MQTT Packet type:" << mqttPacket.packetType();
+            qCWarning(module) << "Unhandled MQTT Packet type:" << mqttPacket.packetType();
             break;
         }
     }
@@ -245,7 +245,7 @@ void QMqttPacketParser::parseCONNACK(const MQTTPacket &packet)
 {
     if (packet.remainingLength() != 2) {
         const QString errorMessage = QStringLiteral("Invalid CONNACK packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -257,7 +257,7 @@ void QMqttPacketParser::parseCONNACK(const MQTTPacket &packet)
         const QString errorMessage =
                 QStringLiteral("Invalid acknowledge flags detected: %1. Upper 7 bits must be zero.")
                 .arg(connectAcknowledgeFlags);
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -266,7 +266,7 @@ void QMqttPacketParser::parseCONNACK(const MQTTPacket &packet)
     if (connectReturnCode > 5) {
         const QString errorMessage =
                 QStringLiteral("Invalid return code detected: %1.").arg(connectReturnCode);
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -278,7 +278,7 @@ void QMqttPacketParser::parseSUBACK(const MQTTPacket &packet)
 {
     if (packet.remainingLength() < 2) {
         const QString errorMessage = QStringLiteral("Invalid SUBACK packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -296,7 +296,7 @@ void QMqttPacketParser::parseSUBACK(const MQTTPacket &packet)
                 const QString errorMessage =
                         QStringLiteral("Invalid return code detected in SUBACK packet: %1")
                         .arg(returnCode);
-                qWarning() << errorMessage;
+                qCWarning(module) << errorMessage;
                 Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
                 return;
             }
@@ -310,7 +310,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
 {
     if (packet.remainingLength() <  2) {
         const QString errorMessage = QStringLiteral("Invalid PUBLISH packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -321,7 +321,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
         const QString errorMessage
                 = QStringLiteral("Error opening read buffer: %1")
                 .arg(buffer.errorString());
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::PARSE_ERROR, errorMessage);
         return;
     }
@@ -336,7 +336,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
         const QString errorMessage
                 = QStringLiteral("Error reading from packet buffer. Bytes read = %1 <> 2")
                 .arg(bytesRead);
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::PARSE_ERROR, errorMessage);
         return;
     }
@@ -346,7 +346,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
     if (buffer.bytesAvailable() < topicNameLength) {
         const QString errorMessage
                 = QStringLiteral("Invalid PUBLISH packet received. Invalid topic name.");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -356,7 +356,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
         const QString errorMessage
                 = QStringLiteral("Error reading from packet buffer. Bytes read = %1 <> %2")
                 .arg(bytesRead).arg(topicNameLength);
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::PARSE_ERROR, errorMessage);
         return;
     }
@@ -367,7 +367,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
         if (packet.remainingLength() <  2) {
             const QString errorMessage
                     = QStringLiteral("Invalid PUBLISH packet received. No packet identifier.");
-            qWarning() << errorMessage;
+            qCWarning(module) << errorMessage;
             Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
             return;
         }
@@ -379,7 +379,7 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
             const QString errorMessage
                     = QStringLiteral("Error reading from packet buffer. Bytes read = %1 <> 2")
                     .arg(bytesRead);
-            qWarning() << errorMessage;
+            qCWarning(module) << errorMessage;
             Q_EMIT error(QMqttProtocol::Error::PARSE_ERROR, errorMessage);
             return;
         }
@@ -392,14 +392,14 @@ void QMqttPacketParser::parsePUBLISH(const MQTTPacket &packet)
     if (buffer.bytesAvailable() != messageLength) {
         const QString errorMessage
                 = QStringLiteral("Invalid PUBLISH packet received. Payload too small.");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
     const QByteArray message = buffer.read(messageLength);
     if (message.size() != messageLength) {
         const QString errorMessage = QStringLiteral("Error reading message: %1.").arg(buffer.errorString());
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::PARSE_ERROR, errorMessage);
         return;
     }
@@ -411,13 +411,13 @@ void QMqttPacketParser::parsePUBREL(const MQTTPacket &packet)
 {
     if (packet.remainingLength() < 2) {
         const QString errorMessage = QStringLiteral("Invalid PUBREL packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
     if (packet.flags() != 0x02) {
         const QString errorMessage = QStringLiteral("Invalid flags in PUBREL packet.");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::PROTOCOL_VIOLATION, errorMessage);
         return;
     }
@@ -432,7 +432,7 @@ void QMqttPacketParser::parsePUBACK(const MQTTPacket &packet)
 {
     if (packet.remainingLength() < 2) {
         const QString errorMessage = QStringLiteral("Invalid PUBACK packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }
@@ -447,7 +447,7 @@ void QMqttPacketParser::parseUNSUBACK(const MQTTPacket &packet)
 {
     if (packet.remainingLength() < 2) {
         const QString errorMessage = QStringLiteral("Invalid UNSUBACK packet received");
-        qWarning() << errorMessage;
+        qCWarning(module) << errorMessage;
         Q_EMIT error(QMqttProtocol::Error::INVALID_PACKET, errorMessage);
         return;
     }

@@ -4,6 +4,9 @@
 #include <QVector>
 #include <QDebug>
 #include <limits>
+#include "logging_p.h"
+
+LoggingModule("QMqttControlPacket");
 
 /*!
     \enum ControlPacket::PacketType
@@ -52,8 +55,8 @@ QByteArray encodeData(const QByteArray &data) noexcept
         }
         return encodedData;
     } else {
-        qWarning() << "Data is too big: size =" << size
-                   << "maximum size=" << std::numeric_limits<uint16_t>::max();
+        qCWarning(module) << "Data is too big: size =" << size
+                          << "maximum size=" << std::numeric_limits<uint16_t>::max();
         return QByteArray();
     }
 }
@@ -100,8 +103,8 @@ QByteArray QMqttControlPacket::encode() const
     const QByteArray payloadData = payload();
     const ssize_t remainingLength = variableHdr.size() + payloadData.size();
     if (remainingLength > QMqttControlPacket::MAXIMUM_CONTROL_PACKET_SIZE) {
-        qWarning() << "Packet size too big:" << remainingLength
-                   << "maximum:" << QMqttControlPacket::MAXIMUM_CONTROL_PACKET_SIZE;
+        qCWarning(module) << "Packet size too big:" << remainingLength
+                          << "maximum:" << QMqttControlPacket::MAXIMUM_CONTROL_PACKET_SIZE;
         return packet;
     }
     return packet

@@ -2,6 +2,9 @@
 #include "qmqttclient_p.h"
 #include "qmqttnetworkrequest.h"
 #include "qmqttcontrolpacket_p.h"
+#include "logging_p.h"
+
+LoggingModule("QMqttClient");
 
 QT_BEGIN_NAMESPACE
 
@@ -152,7 +155,7 @@ QMqttClientPrivate::~QMqttClientPrivate()
 void QMqttClientPrivate::connect(const QMqttNetworkRequest &request)
 {
     if (m_state != QMqttProtocol::State::OFFLINE) {
-        qWarning() << "Already connected.";
+        qCWarning(module) << "Already connected.";
         return;
     }
     setState(QMqttProtocol::State::CONNECTING);
@@ -211,7 +214,7 @@ void QMqttClientPrivate::subscribe(const QString &topic, QMqttProtocol::QoS qos,
                                   std::function<void(bool)> cb)
 {
     if (!isTopicNameValid(topic)) {
-        qWarning() << "Invalid topic name detected:" << topic;
+        qCWarning(module) << "Invalid topic name detected:" << topic;
         setImmediate(std::bind(cb, false));
         return;
     }
@@ -228,7 +231,7 @@ void QMqttClientPrivate::subscribe(const QString &topic, QMqttProtocol::QoS qos,
 void QMqttClientPrivate::unsubscribe(const QString &topic, std::function<void (bool)> cb)
 {
     if (!isTopicNameValid(topic)) {
-        qWarning() << "Invalid topic name detected:" << topic;
+        qCWarning(module) << "Invalid topic name detected:" << topic;
         setImmediate(std::bind(cb, false));
         return;
     }
@@ -317,7 +320,7 @@ void QMqttClientPrivate::onConnackReceived(QMqttProtocol::Error err, bool sessio
 {
     Q_Q(QMqttClient);
 
-    qDebug() << "Received connack with returncode:" << err << "and session present:" << sessionPresent;
+    qCDebug(module) << "Received connack with returncode:" << err << "and session present:" << sessionPresent;
     if (m_state != QMqttProtocol::State::CONNECTING) {
         const QString errorString =
                 QStringLiteral("Received a CONNACK packet while the MQTT connection is already connected.");
@@ -348,7 +351,7 @@ void QMqttClientPrivate::onConnackReceived(QMqttProtocol::Error err, bool sessio
 void QMqttClientPrivate::onSubackReceived(uint16_t packetIdentifier,
                                          QVector<QMqttProtocol::QoS> qos)
 {
-    qDebug() << "Received suback for packet with id" << packetIdentifier;
+    qCDebug(module) << "Received suback for packet with id" << packetIdentifier;
     if (m_subscribeCallbacks.contains(packetIdentifier)) {
         const std::vector<QMqttProtocol::QoS> qosVector = qos.toStdVector();
         const bool result = std::none_of(qosVector.begin(), qosVector.end(),
@@ -367,7 +370,7 @@ void QMqttClientPrivate::onPublishReceived(QMqttProtocol::QoS qos, uint16_t pack
 {
     Q_Q(QMqttClient);
 
-    qDebug() << "Received publish packet with qos" << qos << "and id" << packetIdentifier;
+    qCDebug(module) << "Received publish packet with qos" << qos << "and id" << packetIdentifier;
 
     Q_EMIT q->messageReceived(topicName, message);
 
@@ -385,7 +388,7 @@ void QMqttClientPrivate::onPublishReceived(QMqttProtocol::QoS qos, uint16_t pack
  */
 void QMqttClientPrivate::onPubRelReceived(uint16_t packetIdentifier)
 {
-    qDebug() << "Received PubRel packet with id" << packetIdentifier;
+    qCDebug(module) << "Received PubRel packet with id" << packetIdentifier;
     QMqttPubCompControlPacket packet(packetIdentifier);
     sendData(packet.encode());
 }
@@ -395,7 +398,7 @@ void QMqttClientPrivate::onPubRelReceived(uint16_t packetIdentifier)
  */
 void QMqttClientPrivate::onPubAckReceived(uint16_t packetIdentifier)
 {
-    qDebug() << "Received PubAck packet with id" << packetIdentifier;
+    qCDebug(module) << "Received PubAck packet with id" << packetIdentifier;
     if (m_subscribeCallbacks.contains(packetIdentifier)) {
         auto cb = m_subscribeCallbacks.value(packetIdentifier);
         m_subscribeCallbacks.remove(packetIdentifier);
@@ -408,7 +411,7 @@ void QMqttClientPrivate::onPubAckReceived(uint16_t packetIdentifier)
  */
 void QMqttClientPrivate::onUnsubackReceived(uint16_t packetIdentifier)
 {
-    qDebug() << "Received unsuback for packet with id" << packetIdentifier;
+    qCDebug(module) << "Received unsuback for packet with id" << packetIdentifier;
     if (m_subscribeCallbacks.contains(packetIdentifier)) {
         auto cb = m_subscribeCallbacks.value(packetIdentifier);
         m_subscribeCallbacks.remove(packetIdentifier);
