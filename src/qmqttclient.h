@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <functional>
 #include "qmqttprotocol.h"
 #include "qmqtt_global.h"
 
