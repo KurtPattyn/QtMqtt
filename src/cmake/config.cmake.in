@@ -25,4 +25,4 @@ check_required_components(Qt@QT_MAJOR_VERSION_REQUIRED@Core
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(%PACKAGE_INCLUDE_INSTALL_DIR%)
+include_directories(@PACKAGE_INCLUDE_INSTALL_DIR@)
