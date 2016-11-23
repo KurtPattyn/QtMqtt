@@ -20,6 +20,8 @@ set(${TARGET_NAME}_PRIVATE_HEADERS
     logging_p.h
 )
 
+add_definitions(-DQTMQTT_LIBRARY)
+
 # will be a static or dynamic library based on the setting of BUILD_SHARED_LIBS
 # see: https://cmake.org/cmake/help/v2.8.12/cmake.html#command%3aadd_library
 # The header files are also included in the add_library command, so that the automoc functionality
