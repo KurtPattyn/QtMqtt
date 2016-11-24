@@ -2,7 +2,7 @@
 
 #include <QtCore/QtGlobal>
 
-#ifndef QTMQTT_STATIC_LIB
+#ifndef QTMQTT_STATIC_BUILD_LIB
 #  if defined(QTMQTT_LIBRARY)
 #    define QTMQTT_EXPORT Q_DECL_EXPORT
 #    ifdef PRIVATE_TESTS_ENABLED

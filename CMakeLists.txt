@@ -76,8 +76,8 @@ find_package(Qt${QT_MAJOR_VERSION_REQUIRED}WebSockets REQUIRED)
 #==============================
 
 if (NOT ${BUILD_SHARED_LIBS})
-    set(QTMQTT_STATIC_LIB ON)
-    add_definitions(-DQTMQTT_STATIC_LIB)
+    set(QTMQTT_STATIC_BUILD_LIB ON)
+    add_definitions(-DQTMQTT_STATIC_BUILD_LIB)
 endif()
 
 add_definitions(-Wall -fvisibility=hidden)
