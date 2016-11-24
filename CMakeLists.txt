@@ -71,6 +71,8 @@ find_package(Qt${QT_MAJOR_VERSION_REQUIRED}Core REQUIRED)
 find_package(Qt${QT_MAJOR_VERSION_REQUIRED}Network REQUIRED)
 find_package(Qt${QT_MAJOR_VERSION_REQUIRED}WebSockets REQUIRED)
 
+export(PACKAGE ${PACKAGE_NAME})
+
 #==============================
 # Add compiler and linker flags
 #==============================
@@ -79,8 +81,6 @@ if (NOT ${BUILD_SHARED_LIBS})
     set(QTMQTT_STATIC_BUILD_LIB ON)
     add_definitions(-DQTMQTT_STATIC_BUILD_LIB)
 endif()
-
-export(PACKAGE ${PACKAGE_NAME})
 
 add_definitions(-Wall -fvisibility=hidden)
 set(CMAKE_CXX_STANDARD 11)
