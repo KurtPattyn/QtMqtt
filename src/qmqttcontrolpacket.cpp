@@ -37,14 +37,14 @@ LoggingModule("QMqttControlPacket");
 
 //helper methods
 template<class T>
-QByteArray encodeNumber(T t) noexcept {
+QByteArray encodeNumber(T t) Q_DECL_NOEXCEPT {
     QByteArray array;
     const T tmp = qToBigEndian(t);
     return array.append(static_cast<const char *>(static_cast<const void *>(&tmp)),
                         sizeof(T));
 }
 
-QByteArray encodeData(const QByteArray &data) noexcept
+QByteArray encodeData(const QByteArray &data) Q_DECL_NOEXCEPT
 {
     const int size = data.size();
     if (size < std::numeric_limits<uint16_t>::max()) {
@@ -61,11 +61,11 @@ QByteArray encodeData(const QByteArray &data) noexcept
     }
 }
 
-inline QByteArray encodeString(const QString &string) noexcept {
+inline QByteArray encodeString(const QString &string) Q_DECL_NOEXCEPT {
     return encodeData(string.toUtf8());
 }
 
-inline QByteArray encodeLength(int32_t length) noexcept {
+inline QByteArray encodeLength(int32_t length) Q_DECL_NOEXCEPT {
     QByteArray encodedLength;
     do {
         uint8_t digit = length % 128;
@@ -101,7 +101,7 @@ QByteArray QMqttControlPacket::encode() const
     const QByteArray fixedHdr = fixedHeader();
     const QByteArray variableHdr = variableHeader();
     const QByteArray payloadData = payload();
-    const ssize_t remainingLength = variableHdr.size() + payloadData.size();
+    const int remainingLength = variableHdr.size() + payloadData.size();
     if (remainingLength > QMqttControlPacket::MAXIMUM_CONTROL_PACKET_SIZE) {
         qCWarning(module) << "Packet size too big:" << remainingLength
                           << "maximum:" << QMqttControlPacket::MAXIMUM_CONTROL_PACKET_SIZE;
