@@ -2,15 +2,21 @@
 
 #include <QtCore/QtGlobal>
 
-#ifndef QT_STATIC
-#  if defined(QT_BUILD_QTMQTT_LIB)
+#ifndef QTMQTT_STATIC_BUILD_LIB
+#  if defined(QTMQTT_LIBRARY)
 #    define QTMQTT_EXPORT Q_DECL_EXPORT
-#    if defined(PRIVATE_TESTS_ENABLED)
+#    ifdef PRIVATE_TESTS_ENABLED
 #      define QTMQTT_AUTOTEST_EXPORT Q_DECL_EXPORT
+#    else
+#      define QTMQTT_AUTOTEST_EXPORT
 #    endif
 #  else
 #    define QTMQTT_EXPORT Q_DECL_IMPORT
-#    define QTMQTT_AUTOTEST_EXPORT Q_DECL_IMPORT
+#    ifdef PRIVATE_TESTS_ENABLED
+#      define QTMQTT_AUTOTEST_EXPORT Q_DECL_IMPORT
+#    else
+#      define QTMQTT_AUTOTEST_EXPORT
+#    endif
 #  endif
 #else
 #  define QTMQTT_EXPORT

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <stdint.h>
 #include "qmqtt_global.h"
 
 //a class is used instead of a namespace so that the enumerations can be marked with
