@@ -80,6 +80,8 @@ if (NOT ${BUILD_SHARED_LIBS})
     add_definitions(-DQTMQTT_STATIC_BUILD_LIB)
 endif()
 
+export(PACKAGE ${PACKAGE_NAME})
+
 add_definitions(-Wall -fvisibility=hidden)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
