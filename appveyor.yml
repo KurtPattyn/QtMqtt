@@ -2,6 +2,8 @@ image: Visual Studio 2013
 
 platform: x64
 
+configuration: Debug
+
 install:
   - set QTDIR=C:\Qt\5.6\msvc2013_64
   - set PATH=%PATH%;%QTDIR%\bin;
