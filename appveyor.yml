@@ -12,5 +12,5 @@ before_build:
   - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
   
 build_script:
-  - make
-  - make test
+  - nmake
+  - nmake test
