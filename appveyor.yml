@@ -15,4 +15,3 @@ before_build:
   
 build_script:
   - nmake
-  - nmake test
