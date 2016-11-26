@@ -13,8 +13,8 @@ set(QT_MAJOR_VERSION_REQUIRED 5)
 #################
 # Build options #
 #################
-# When set to ON, the library will be built as a static library
-option(QTMQTT_STATIC_BUILD "Build static library" OFF)
+# When set to OFF, the library will be built as a static library
+option(BUILD_SHARED_LIBS "Build as shared library" OFF)
 
 #####################################################
 # Start of configuration                            #
@@ -75,9 +75,8 @@ find_package(Qt${QT_MAJOR_VERSION_REQUIRED}WebSockets REQUIRED)
 # Add compiler and linker flags
 #==============================
 
-if (NOT ${BUILD_SHARED_LIBS})
-    set(QTMQTT_STATIC_BUILD_LIB ON)
-    add_definitions(-DQTMQTT_STATIC_BUILD_LIB)
+if (${BUILD_SHARED_LIBS})
+    add_definitions(-DBUILD_SHARED_LIBS)
 endif()
 
 add_definitions(-Wall -fvisibility=hidden)
