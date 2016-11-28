@@ -20,6 +20,6 @@ before_build:
 build_script:
   - cmake --build . --target install
   - dir
-  - ctest
+  - ctest -C Debug
 #  - nmake
 
