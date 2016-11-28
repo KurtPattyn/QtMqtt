@@ -7,11 +7,12 @@ configuration: Debug
 install:
   - set QTDIR=C:\Qt\5.6\msvc2013_64
   - set PATH=%PATH%;%QTDIR%\bin;
+  - set VS_FULL=Visual Studio 12 Win64
   
 before_build:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
+  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
 #  - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 #  - call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat" x86_amd64
   - dir
