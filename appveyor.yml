@@ -17,5 +17,6 @@ before_build:
   - dir
   
 build_script:
+  - cmake --build .
 #  - nmake
 
