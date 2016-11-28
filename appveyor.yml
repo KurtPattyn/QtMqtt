@@ -7,7 +7,7 @@ platform:
 configuration: Debug
   
 before_build:
-  - set VS_VERSION=Visual Studio 12
+  - set VS_VERSION=Visual Studio 12 2013
   - if "%platform%" == "x64" set VS_FULL=%VS_VERSION% Win64
   - if "%platform%" == "x64" set QTDIR=C:\Qt\5.6\msvc2013_64
   - if "%platform%" == "x86" set VS_FULL=%VS_VERSION%"
