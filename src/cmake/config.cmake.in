@@ -27,7 +27,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(@PACKAGE_INCLUDE_INSTALL_DIR@)
 
-if (@QTMQTT_STATIC_BUILD_LIB@)
-    message(STATUS "Using statically linked QtMqtt library")
-    add_definitions(-DQTMQTT_STATIC_BUILD_LIB)
+if (@BUILD_SHARED_LIBS@)
+    message(STATUS "Using dynamic linked QtMqtt library")
+    add_definitions(-DBUILD_SHARED_LIBS)
+else()
+    message(STATUS "Using static linked QtMqtt library")
 endif()
