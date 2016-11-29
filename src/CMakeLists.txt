@@ -20,7 +20,7 @@ set(${TARGET_NAME}_PRIVATE_HEADERS
     logging_p.h
 )
 
-add_definitions(-DQTMQTT_LIBRARY)
+add_definitions(-DQTMQTT_LIBRARY_BUILD)
 
 # will be a static or dynamic library based on the setting of BUILD_SHARED_LIBS
 # see: https://cmake.org/cmake/help/v2.8.12/cmake.html#command%3aadd_library
