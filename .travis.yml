@@ -8,6 +8,9 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
+  env:
+    - SHARED_LIBS=ON
+    - SHARED_LIBS=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -53,7 +56,7 @@ before_script:
   - mkdir build
   - cd build
   - which cmake
-  - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF -DPRIVATE_TESTS_ENABLED=ON ..
+  - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=$SHARED_LIBS -DPRIVATE_TESTS_ENABLED=ON ..
 
 script:
   - make
