@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmqttprotocol.h"
+#include "qmqttwill.h"
 #include "qmqtt_global.h"
 #include <QByteArray>
 #include <QVector>
@@ -65,28 +66,8 @@ public:
      */
     QMqttConnectControlPacket(const QString &clientIdentifier);
 
-    class Will
-    {
-    public:
-        Will();
-        Will(const QString &topic, const QByteArray &message, bool retain, QMqttProtocol::QoS qos);
-
-        bool isValid() const;
-        bool retain() const;
-        QMqttProtocol::QoS qos() const;
-        QString topic() const;
-        QByteArray message() const;
-
-    private:
-        const QString m_topic;
-        const QByteArray m_message;
-        const bool m_valid;
-        const bool m_retain;
-        const QMqttProtocol::QoS m_qos;
-    };
-
     void setCredentials(const QString &userName, const QByteArray &password = QByteArray());
-    void setWill(const Will &will);
+    void setWill(const QMqttWill &will);
     void setCleanSession(bool isClean);
     /**
      * keepAliveSecs is the maximum time interval in seconds that is permitted to elapse between the
@@ -114,7 +95,7 @@ protected:
 private:
     QString m_userName;
     QByteArray m_password;
-    Will m_will;
+    QMqttWill m_will;
     bool m_clean;
     uint16_t m_keepAlive;
     QString m_clientIdentifier;

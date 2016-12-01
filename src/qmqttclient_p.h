@@ -10,8 +10,7 @@
 #include <QTimer>
 #include "qmqttprotocol.h"
 #include "qmqttpacketparser_p.h"
-
-QT_BEGIN_NAMESPACE
+#include "qmqttwill.h"
 
 class QMqttClient;
 class QMqttNetworkRequest;
@@ -22,7 +21,7 @@ class QMqttClientPrivate : public QObject
     Q_DECLARE_PUBLIC(QMqttClient)
 
 public:
-    QMqttClientPrivate(const QString &clientId, QMqttClient * const q);
+    QMqttClientPrivate(const QString &clientId, const QMqttWill &will, QMqttClient * const q);
     virtual ~QMqttClientPrivate();
 
     void connect(const QMqttNetworkRequest &request);
@@ -47,6 +46,7 @@ private:
     QScopedPointer<QMqttPacketParser> m_packetParser;
     uint16_t m_packetIdentifier;
     QMap<uint16_t, std::function<void(bool)>> m_subscribeCallbacks;
+    QMqttWill m_will;
 
 private Q_SLOTS:
     void onSocketConnected();
@@ -65,4 +65,3 @@ private: //helpers
     void sendData(const QByteArray &data);
 };
 
-QT_END_NAMESPACE

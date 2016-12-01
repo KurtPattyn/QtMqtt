@@ -126,45 +126,16 @@ QMqttConnectControlPacket::QMqttConnectControlPacket(const QString &clientIdenti
     Q_ASSERT(clientIdentifier.length() < 24);
 }
 
-QMqttConnectControlPacket::Will::Will() :
-    m_topic(), m_message(), m_valid(false), m_retain(false), m_qos(QMqttProtocol::QoS::AT_MOST_ONCE)
-{}
-
-QMqttConnectControlPacket::Will::Will(const QString &topic, const QByteArray &message,
-                                 bool retain, QMqttProtocol::QoS qos) :
-    m_topic(topic), m_message(message), m_valid(true), m_retain(retain), m_qos(qos)
-{}
-
-bool QMqttConnectControlPacket::Will::isValid() const
-{
-    return m_valid;
-}
-
-bool QMqttConnectControlPacket::Will::retain() const
-{
-    return m_retain;
-}
-
-QMqttProtocol::QoS QMqttConnectControlPacket::Will::qos() const
-{
-    return m_qos;
-}
-
-QString QMqttConnectControlPacket::Will::topic() const
-{
-    return m_topic;
-}
-
-QByteArray QMqttConnectControlPacket::Will::message() const
-{
-    return m_message;
-}
-
 void QMqttConnectControlPacket::setCredentials(const QString &userName, const QByteArray &password)
 {
     Q_ASSERT(!userName.isEmpty());
     m_userName = userName;
     m_password = password;
+}
+
+void QMqttConnectControlPacket::setWill(const QMqttWill &will)
+{
+    m_will = will;
 }
 
 bool QMqttConnectControlPacket::hasUserName() const

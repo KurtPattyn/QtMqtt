@@ -2,11 +2,10 @@
 #include "qmqttclient_p.h"
 #include "qmqttnetworkrequest.h"
 #include "qmqttcontrolpacket_p.h"
+#include "qmqttwill.h"
 #include "logging_p.h"
 
 LoggingModule("QMqttClient");
-
-QT_BEGIN_NAMESPACE
 
 /*!
    \class QMqttClient
@@ -125,7 +124,8 @@ void setImmediate(std::function<void()> f)
 /*!
    \internal
  */
-QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * const q) :
+QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill &will,
+                                       QMqttClient * const q) :
     QObject(),
     q_ptr(q),
     m_clientId(clientId),
@@ -136,7 +136,8 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
     m_state(QMqttProtocol::State::OFFLINE),
     m_packetParser(new QMqttPacketParser),
     m_packetIdentifier(0),
-    m_subscribeCallbacks()
+    m_subscribeCallbacks(),
+    m_will(will)
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
@@ -308,6 +309,7 @@ void QMqttClientPrivate::onPongReceived()
 void QMqttClientPrivate::onSocketConnected()
 {
     QMqttConnectControlPacket packet(m_clientId);
+    packet.setWill(m_will);
     m_webSocket->sendBinaryMessage(packet.encode());
 
     //TODO: initialize connection timeout
@@ -512,9 +514,9 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
  */
-QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
+QMqttClient::QMqttClient(const QString &clientId, const QMqttWill &will, QObject *parent) :
     QObject(parent),
-    d_ptr(new QMqttClientPrivate(clientId, this))
+    d_ptr(new QMqttClientPrivate(clientId, will, this))
 {
 }
 
@@ -655,4 +657,3 @@ void QMqttClient::publish(const QString &topic, const QByteArray &message,
     d->publish(topic, message, cb);
 }
 
-QT_END_NAMESPACE
