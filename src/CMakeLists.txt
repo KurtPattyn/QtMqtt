@@ -4,6 +4,7 @@ set(${TARGET_NAME}_SOURCES
     qmqttcontrolpacket.cpp
     qmqttnetworkrequest.cpp
     qmqttpacketparser.cpp
+    qmqttwill.cpp
 )
 
 set(${TARGET_NAME}_PUBLIC_HEADERS
@@ -11,12 +12,14 @@ set(${TARGET_NAME}_PUBLIC_HEADERS
     qmqttprotocol.h
     qmqtt_global.h
     qmqttnetworkrequest.h
+    qmqttwill.h
 )
 
 set(${TARGET_NAME}_PRIVATE_HEADERS
     qmqttclient_p.h
     qmqttcontrolpacket_p.h
     qmqttpacketparser_p.h
+    qmqttwill_p.h
     logging_p.h
 )
 

@@ -2,13 +2,12 @@
 
 #include <QObject>
 #include <functional>
+#include "qmqttwill.h"
 #include "qmqttprotocol.h"
 #include "qmqtt_global.h"
 
 //TODO: add SSL connectivity
 //Currently only secure websockets are supported
-
-QT_BEGIN_NAMESPACE
 
 class QMqttNetworkRequest;
 class QString;
@@ -21,7 +20,8 @@ class QTMQTT_EXPORT QMqttClient : public QObject
     Q_DISABLE_COPY(QMqttClient)
 
 public:
-    QMqttClient(const QString &clientId, QObject *parent = nullptr);
+    QMqttClient(const QString &clientId, const QMqttWill &will = QMqttWill(),
+                QObject *parent = nullptr);
     virtual ~QMqttClient();
 
     using QObject::connect;
@@ -44,4 +44,3 @@ Q_SIGNALS:
 private:
     QScopedPointer<QMqttClientPrivate> d_ptr;
 };
-QT_END_NAMESPACE
