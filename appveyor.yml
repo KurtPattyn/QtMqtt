@@ -4,7 +4,9 @@ platform:
   - x64
   - x86
 
-configuration: Debug
+configuration:
+  - Debug
+  - Release
 
 environment:
   matrix:
@@ -36,8 +38,8 @@ before_build:
   - dir
   
 build_script:
-  - cmake --build . --target install
-  
+  - cmake --build . --target install --config %configuration%
+
 test_script:
   - ctest -C Debug
 
