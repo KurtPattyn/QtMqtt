@@ -101,7 +101,14 @@ message(STATUS "Header files will be installed to: ${CMAKE_INSTALL_PREFIX}/${INC
 message(STATUS "Executables will be installed in: ${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}")
 message(STATUS "CMake config-files will be written to: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DIR}")
 message(STATUS "${PROJECT_NAME} import target: ${PROJECT_NAMESPACE}::${TARGET_NAME}")
-message(STATUS "Building ${PROJECT_NAME} ${FULL_VERSION} in ${CMAKE_BUILD_TYPE} mode")
+if(CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "You are using a Multi-Configuration CMake Generator.")
+  message(STATUS "${PROJECT_NAME} ${FULL_VERSION} can be built for: "
+                 "${CMAKE_CONFIGURATION_TYPES}. Please be sure to specifiy the"
+                 " desired configuration to the compiler.")
+else()
+  message(STATUS "Building ${PROJECT_NAME} ${FULL_VERSION} in ${CMAKE_BUILD_TYPE} mode")
+endif()
 if (PRIVATE_TESTS_ENABLED)
   message(STATUS "Private tests are enabled")
 endif()
