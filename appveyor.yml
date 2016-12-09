@@ -34,7 +34,7 @@ before_build:
   - set PATH=%PATH%;%QTDIR%\bin;
   - mkdir build
   - cd build
-  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
+  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=%configuration% -DBUILD_SHARED_LIBS=OFF ..
   - dir
   
 build_script:
