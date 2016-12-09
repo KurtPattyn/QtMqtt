@@ -4,7 +4,9 @@ platform:
   - x64
   - x86
 
-configuration: Debug
+configuration:
+  - Debug
+  - Release
 
 environment:
   matrix:
