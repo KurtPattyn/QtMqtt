@@ -36,8 +36,19 @@ cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
 #To make a release build, change `-DCMAKE_BUILD_TYPE=debug` to `-DCMAKE_BUILD_TYPE=release`  
 #To make a dynamic library, change `-DBUILD_SHARED_LIBS=OFF` to `-DBUILD_SHARED_LIBS=ON`
 
-#Build the library  
+#Using a Single-Configuration CMake generator, one can build the library using
 make
+#or
+cmake --build .
+
+#Using a Multi-Configuration CMake, one must also specifiy the correct
+#build configuration to compile the library with, i.e. "release", "debug", ...
+cmake --build --config <build configuration>
+#or
+xcodebuild -project Qt5Mqtt.xcodeproj -configuration <build configuration>
+#or
+msbuild QtMqtt.sln /p:Configuration=<build configuration>
+
 ```
 ### Run unit tests
 `make test`
