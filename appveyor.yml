@@ -41,5 +41,4 @@ build_script:
   - cmake --build . --target install --config %configuration%
 
 test_script:
-  - ctest -C Debug
-
+  - ctest -C %configuration%
