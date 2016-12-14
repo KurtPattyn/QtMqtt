@@ -131,7 +131,7 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill 
     m_clientId(clientId),
     m_pongReceived(false),
     m_pingTimer(),
-    m_pingIntervalMs(10000),
+    m_pingIntervalMs(1200000), // 20 minutes
     m_webSocket(new QWebSocket),
     m_state(QMqttProtocol::State::OFFLINE),
     m_packetParser(new QMqttPacketParser),
