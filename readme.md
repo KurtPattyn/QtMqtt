@@ -1,4 +1,7 @@
 # QtMqtt
+[![License][license-image]][license-url]
+[![Linux/OS X Build Status][travis-image]][travis-url]
+[![Windows Build Status][appveyor-image]][appveyor-url]
 
 ##### Author: [Kurt Pattyn](https://github.com/kurtpattyn).
 
@@ -65,3 +68,15 @@ In your C++ source file include the QtMqtt module
 
 To enable debugging information of QtMqtt, the following environment variable can be defined.    
 `QT_LOGGING_RULES="QtMqtt.*.debug=true"`
+
+## License
+
+  [MIT](LICENSE)
+
+
+[license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-url]: LICENSE
+[travis-image]: https://travis-ci.org/KurtPattyn/QtMqtt.svg?branch=develop
+[travis-url]: https://travis-ci.org/KurtPattyn/QtMqtt
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/4tmm94uvuwscadsv?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/KurtPattyn/qtmqtt
