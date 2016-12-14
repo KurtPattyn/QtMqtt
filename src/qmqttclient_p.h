@@ -47,6 +47,7 @@ private:
     uint16_t m_packetIdentifier;
     QMap<uint16_t, std::function<void(bool)>> m_subscribeCallbacks;
     QMqttWill m_will;
+    bool m_signalSlotConnected;
 
 private Q_SLOTS:
     void onSocketConnected();

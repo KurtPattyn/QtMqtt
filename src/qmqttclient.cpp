@@ -131,13 +131,14 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill 
     m_clientId(clientId),
     m_pongReceived(false),
     m_pingTimer(),
-    m_pingIntervalMs(10000),
+    m_pingIntervalMs(1200000), // 20 minutes
     m_webSocket(new QWebSocket),
     m_state(QMqttProtocol::State::OFFLINE),
     m_packetParser(new QMqttPacketParser),
     m_packetIdentifier(0),
     m_subscribeCallbacks(),
-    m_will(will)
+    m_will(will),
+    m_signalSlotConnected(false)
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
@@ -450,6 +451,11 @@ QString toString(const QList<QSslError> &sslErrors) {
  */
 void QMqttClientPrivate::makeSignalSlotConnections()
 {
+    if (m_signalSlotConnected)
+    {
+        return;
+    }
+
     Q_Q(QMqttClient);
 
     QObject::connect(m_webSocket.data(), &QWebSocket::connected,
@@ -506,6 +512,8 @@ void QMqttClientPrivate::makeSignalSlotConnections()
     //forward parser errors to AWS IoT Client
     QObject::connect(m_packetParser.data(), &QMqttPacketParser::error,
                      q, &QMqttClient::error, Qt::QueuedConnection);
+
+    m_signalSlotConnected = true;
 }
 
 /*!
