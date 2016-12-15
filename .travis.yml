@@ -1,0 +1,69 @@
+language: c++
+sudo: required
+
+matrix:
+  include:
+    - os: osx
+      compiler: clang
+      env: SHARED_LIBS=ON
+    - os: osx
+      compiler: clang
+      env: SHARED_LIBS=OFF
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      env: SHARED_LIBS=ON
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      env: SHARED_LIBS=OFF
+
+install:
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+  ############################################################################
+  # Install a recent CMake (unless already installed on OS X)
+  ############################################################################
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="http://www.cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    else
+      if ! brew ls --version cmake &>/dev/null; then brew install cmake; fi
+    fi
+    
+  ############################################################################
+  # Install Qt5.6
+  ############################################################################
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      sudo apt-add-repository -y ppa:beineri/opt-qt57-trusty
+      sudo apt-get -qq update
+      sudo apt-get -qq install qt57tools qt57websockets
+    else
+      brew update > /dev/null
+      brew tap homebrew/versions
+      brew install qt5
+    fi
+
+before_script:
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      export QTDIR="/opt/qt57"
+      export PATH="$QTDIR/bin:$PATH"
+      qt57-env.sh
+    else
+      export QTDIR="/usr/local/Cellar/qt5/5.7.0"
+      export PATH="$QTDIR/bin:$PATH"
+    fi
+    
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir build
+  - cd build
+  - which cmake
+  - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=${SHARED_LIBS} -DPRIVATE_TESTS_ENABLED=ON ..
+
+script:
+  - make
+  - make test

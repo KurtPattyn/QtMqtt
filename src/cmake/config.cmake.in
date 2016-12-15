@@ -1,0 +1,35 @@
+# - Config file for the @MODULE_NAME@ module
+# To be used as:
+# find_package(@PACKAGE_NAME@)
+# target_link_libraries(@PROJECT_NAMESPACE@::@PROJECT_BASE_NAME@)
+# This will automatically set the correct include directories and link libraries
+
+#For more information regarding config files see:
+#https://cmake.org/cmake/help/v3.5/module/CMakePackageConfigHelpers.html
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_CONFIG_FILE_BASE_NAME@Targets.cmake")
+
+# find_package will silently look for the dependencies and set the correct
+# include directories and link libraries
+find_package(Qt@QT_MAJOR_VERSION_REQUIRED@Core QUIET)
+find_package(Qt@QT_MAJOR_VERSION_REQUIRED@NetWork QUIET)
+find_package(Qt@QT_MAJOR_VERSION_REQUIRED@WebSockets QUIET)
+
+check_required_components(Qt@QT_MAJOR_VERSION_REQUIRED@Core
+                          Qt@QT_MAJOR_VERSION_REQUIRED@Network
+                          Qt@QT_MAJOR_VERSION_REQUIRED@WebSockets)
+
+# QtMqtt requires C++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include_directories(@PACKAGE_INCLUDE_INSTALL_DIR@)
+
+if (@BUILD_SHARED_LIBS@)
+    message(STATUS "Using dynamic linked @PROJECT_NAME@ library")
+    add_definitions(-DBUILD_SHARED_LIBS)
+else()
+    message(STATUS "Using static linked @PROJECT_NAME@ library")
+endif()

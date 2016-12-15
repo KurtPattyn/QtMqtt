@@ -1,0 +1,3 @@
+.qmake.*
+CMakeLists.txt.user
+build

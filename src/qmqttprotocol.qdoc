@@ -1,0 +1,49 @@
+/*!
+  \class QMqttProtocol
+
+  \inmodule QtMqtt
+
+  The class QMqttProtocol serves as a namespace for common MQTT constants and defines.
+*/
+
+/*!
+  \enum QMqttProtocol::QoS
+
+  \inmodule QtMqtt
+
+  \value AT_MOST_ONCE   Message will be delivered at most once; message can be lost
+  \value AT_LEAST_ONCE  Message will be delivered at least once; message can be delivered more than once
+  \value EXACTLY_ONCE   Message will be delivered exactly once
+  \value INVALID        Invalid value
+*/
+
+/*!
+    \enum QMqttProtocol::Error
+
+    \inmodule QtMqtt
+
+    \value CONNECTION_ACCEPTED                          Connection is accepted by the server
+    \value CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL     Invalid protocol version requested
+    \value CONNECTION_REFUSED_IDENTIFIER_REJECTED       Invalid client identifier
+    \value CONNECTION_REFUSED_SERVER_UNAVAILABLE        The MQTT server is currently unavailable
+    \value CONNECTION_REFUSED_BAD_USERNAME_OR_PASSWORD  Wrong username and/or password
+    \value CONNECTION_REFUSED_NOT_AUTHORIZED            Not authorized to connect
+
+    \value OK                                           No error
+    \value INVALID_PACKET                               An malformed packet was received
+    \value PROTOCOL_VIOLATION                           A protocol violation was detected
+    \value PARSE_ERROR                                  An error occurred during parsing an incoming packet
+    \value TIME_OUT                                     Operation timed out; e.g. during connection
+    \value CONNECTION_FAILED                            TCP connection failed
+*/
+
+/*!
+    \enum QMqttProtocol::State
+
+    \inmodule QtMqtt
+
+    \value OFFLINE          The client is offline
+    \value CONNECTING       The client is connecting to the server; waiting for an acknowledgement
+    \value CONNECTED        The client is connected
+    \value DISCONNECTING    The client is disconnecting
+*/
