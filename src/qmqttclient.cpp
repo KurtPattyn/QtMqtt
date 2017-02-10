@@ -124,8 +124,7 @@ void setImmediate(std::function<void()> f)
 /*!
    \internal
  */
-QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill &will,
-                                       QMqttClient * const q) :
+QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * const q) :
     QObject(),
     q_ptr(q),
     m_clientId(clientId),
@@ -137,7 +136,7 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill 
     m_packetParser(new QMqttPacketParser),
     m_packetIdentifier(0),
     m_subscribeCallbacks(),
-    m_will(will),
+    m_will(),
     m_signalSlotConnected(false)
 {
     Q_ASSERT(q);
@@ -154,12 +153,13 @@ QMqttClientPrivate::~QMqttClientPrivate()
 /*!
    \internal
  */
-void QMqttClientPrivate::connect(const QMqttNetworkRequest &request)
+void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
 {
     if (m_state != QMqttProtocol::State::OFFLINE) {
         qCWarning(module) << "Already connected.";
         return;
     }
+    m_will = will;
     setState(QMqttProtocol::State::CONNECTING);
 
     makeSignalSlotConnections();
@@ -522,9 +522,9 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
  */
-QMqttClient::QMqttClient(const QString &clientId, const QMqttWill &will, QObject *parent) :
+QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
     QObject(parent),
-    d_ptr(new QMqttClientPrivate(clientId, will, this))
+    d_ptr(new QMqttClientPrivate(clientId, this))
 {
 }
 
@@ -550,11 +550,11 @@ QMqttClient::~QMqttClient()
 
   \sa disconnect(), stateChanged()
  */
-void QMqttClient::connect(const QMqttNetworkRequest &request)
+void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
 {
     Q_D(QMqttClient);
 
-    d->connect(request);
+    d->connect(request, will);
 }
 
 /*!
