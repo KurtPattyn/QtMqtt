@@ -517,7 +517,7 @@ void QMqttClientPrivate::makeSignalSlotConnections()
     QObject::connect(m_packetParser.data(), &QMqttPacketParser::pong,
                      this, &QMqttClientPrivate::onPongReceived, Qt::QueuedConnection);
 
-    //forward parser errors to AWS IoT Client
+    //forward parser errors to user of QMqttClient
     QObject::connect(m_packetParser.data(), &QMqttPacketParser::error,
                      q, &QMqttClient::error, Qt::QueuedConnection);
 
