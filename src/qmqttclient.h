@@ -20,12 +20,11 @@ class QTMQTT_EXPORT QMqttClient : public QObject
     Q_DISABLE_COPY(QMqttClient)
 
 public:
-    QMqttClient(const QString &clientId, const QMqttWill &will = QMqttWill(),
-                QObject *parent = nullptr);
+    QMqttClient(const QString &clientId, QObject *parent = nullptr);
     virtual ~QMqttClient();
 
     using QObject::connect;
-    void connect(const QMqttNetworkRequest &request);
+    void connect(const QMqttNetworkRequest &request, const QMqttWill &will =  QMqttWill());
     using QObject::disconnect;
     void disconnect();
 

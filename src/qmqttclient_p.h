@@ -21,10 +21,10 @@ class QMqttClientPrivate : public QObject
     Q_DECLARE_PUBLIC(QMqttClient)
 
 public:
-    QMqttClientPrivate(const QString &clientId, const QMqttWill &will, QMqttClient * const q);
+    QMqttClientPrivate(const QString &clientId, QMqttClient * const q);
     virtual ~QMqttClientPrivate();
 
-    void connect(const QMqttNetworkRequest &request);
+    void connect(const QMqttNetworkRequest &request, const QMqttWill &will);
     void disconnect();
     void subscribe(const QString &topic, QMqttProtocol::QoS qos, std::function<void(bool)> cb);
     void unsubscribe(const QString &topic, std::function<void (bool)> cb);
