@@ -38,7 +38,7 @@ install:
   ############################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      sudo apt-add-repository -y ppa:beineri/opt-qt57-trusty
+      sudo apt-add-repository -y ppa:beineri/opt-qt571-trusty
       sudo apt-get -qq update
       sudo apt-get -qq install qt57tools qt57websockets
     else
