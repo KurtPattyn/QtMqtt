@@ -54,7 +54,8 @@ before_script:
       export PATH="$QTDIR/bin:$PATH"
       qt57-env.sh
     else
-      export QTDIR="/usr/local/Cellar/qt5/5.7.0"
+      #export QTDIR="/usr/local/Cellar/qt5/5.7.0"
+      export QTDIR="/usr/local/opt/qt5"
       export PATH="$QTDIR/bin:$PATH"
     fi
     
