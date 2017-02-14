@@ -21,7 +21,7 @@ check_required_components(Qt@QT_MAJOR_VERSION_REQUIRED@Core
                           Qt@QT_MAJOR_VERSION_REQUIRED@Network
                           Qt@QT_MAJOR_VERSION_REQUIRED@WebSockets)
 
-# QtMqtt requires C++11
+# @PROJECT_NAME@ requires C++11
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
