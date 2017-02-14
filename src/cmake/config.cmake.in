@@ -29,7 +29,4 @@ include_directories(@PACKAGE_INCLUDE_INSTALL_DIR@)
 
 if (@BUILD_SHARED_LIBS@)
     add_definitions(-D@PROJECT_NAME@_BUILD_SHARED_LIBS)
-    message(STATUS "Using dynamic linked @PROJECT_NAME@ library")
-else()
-    message(STATUS "Using static linked @PROJECT_NAME@ library")
 endif()
