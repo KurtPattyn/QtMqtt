@@ -76,7 +76,7 @@ find_package(Qt${QT_MAJOR_VERSION_REQUIRED}WebSockets REQUIRED)
 #==============================
 
 if (${BUILD_SHARED_LIBS})
-    add_definitions(-DBUILD_SHARED_LIBS)
+    add_definitions(-D${PROJECT_NAME}_BUILD_SHARED_LIBS)
 endif()
 
 add_definitions(-Wall -fvisibility=hidden)
