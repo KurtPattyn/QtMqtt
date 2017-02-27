@@ -534,6 +534,7 @@ QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
     QObject(parent),
     d_ptr(new QMqttClientPrivate(clientId, this))
 {
+    qRegisterMetaType<QMqttProtocol::State>("QMqttProtocol::State");
 }
 
 /*!
