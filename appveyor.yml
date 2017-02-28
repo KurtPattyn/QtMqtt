@@ -4,7 +4,9 @@ platform:
   - x64
   - x86
 
-configuration: Debug
+configuration:
+  - Debug
+  - Release
 
 environment:
   matrix:
@@ -32,12 +34,11 @@ before_build:
   - set PATH=%PATH%;%QTDIR%\bin;
   - mkdir build
   - cd build
-  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=OFF ..
+  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=%configuration% -DBUILD_SHARED_LIBS=OFF ..
   - dir
   
 build_script:
-  - cmake --build . --target install
-  
-test_script:
-  - ctest -C Debug
+  - cmake --build . --target install --config %configuration%
 
+test_script:
+  - ctest -C %configuration%
