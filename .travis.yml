@@ -38,7 +38,7 @@ install:
   ############################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      sudo apt-add-repository -y ppa:beineri/opt-qt57-trusty
+      sudo apt-add-repository -y ppa:beineri/opt-qt571-trusty
       sudo apt-get -qq update
       sudo apt-get -qq install qt57tools qt57websockets
     else
@@ -54,7 +54,8 @@ before_script:
       export PATH="$QTDIR/bin:$PATH"
       qt57-env.sh
     else
-      export QTDIR="/usr/local/Cellar/qt5/5.7.0"
+      #export QTDIR="/usr/local/Cellar/qt5/5.7.0"
+      export QTDIR="/usr/local/opt/qt5"
       export PATH="$QTDIR/bin:$PATH"
     fi
     

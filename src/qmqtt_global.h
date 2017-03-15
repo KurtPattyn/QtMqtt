@@ -2,7 +2,7 @@
 
 #include <QtCore/QtGlobal>
 
-#ifdef BUILD_SHARED_LIBS
+#ifdef QtMqtt_BUILD_SHARED_LIBS
 #  if defined(QTMQTT_LIBRARY_BUILD)
 #    define QTMQTT_EXPORT Q_DECL_EXPORT
 #    ifdef PRIVATE_TESTS_ENABLED

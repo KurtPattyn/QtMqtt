@@ -124,8 +124,7 @@ void setImmediate(std::function<void()> f)
 /*!
    \internal
  */
-QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill &will,
-                                       QMqttClient * const q) :
+QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * const q) :
     QObject(),
     q_ptr(q),
     m_clientId(clientId),
@@ -137,7 +136,7 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QMqttWill 
     m_packetParser(new QMqttPacketParser),
     m_packetIdentifier(0),
     m_subscribeCallbacks(),
-    m_will(will),
+    m_will(),
     m_signalSlotConnected(false)
 {
     Q_ASSERT(q);
@@ -154,12 +153,14 @@ QMqttClientPrivate::~QMqttClientPrivate()
 /*!
    \internal
  */
-void QMqttClientPrivate::connect(const QMqttNetworkRequest &request)
+void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
 {
     if (m_state != QMqttProtocol::State::OFFLINE) {
         qCWarning(module) << "Already connected.";
         return;
     }
+    m_will = will;
+    qCDebug(module) << "Connecting to Mqtt backend @ endpoint" << request.url();
     setState(QMqttProtocol::State::CONNECTING);
 
     makeSignalSlotConnections();
@@ -220,6 +221,7 @@ void QMqttClientPrivate::subscribe(const QString &topic, QMqttProtocol::QoS qos,
         setImmediate(std::bind(cb, false));
         return;
     }
+    qCDebug(module) << "Subscribing to topic" << topic;
     QVector<QPair<QString, QMqttProtocol::QoS>> topicFilters
             = { { topic, qos } };
     QMqttSubscribeControlPacket subscribePacket(++m_packetIdentifier, topicFilters);
@@ -247,6 +249,7 @@ void QMqttClientPrivate::unsubscribe(const QString &topic, std::function<void (b
  */
 void QMqttClientPrivate::publish(const QString &topic, const QByteArray &message)
 {
+    qCDebug(module) << "Publishing" << message << "to topic" << topic;
     QMqttPublishControlPacket packet(topic, message, QMqttProtocol::QoS::AT_MOST_ONCE, false);
     sendData(packet.encode());
 }
@@ -257,8 +260,9 @@ void QMqttClientPrivate::publish(const QString &topic, const QByteArray &message
 void QMqttClientPrivate::publish(const QString &topic, const QByteArray &message,
                                 std::function<void (bool)> cb)
 {
+    qCDebug(module) << "Publishing" << message << "to topic" << topic;
     QMqttPublishControlPacket packet(topic, message, QMqttProtocol::QoS::AT_LEAST_ONCE,
-                                false, ++m_packetIdentifier);
+                                     false, ++m_packetIdentifier);
     m_subscribeCallbacks.insert(m_packetIdentifier, cb);
     sendData(packet.encode());
 }
@@ -281,6 +285,7 @@ void QMqttClientPrivate::setState(QMqttProtocol::State newState)
  */
 void QMqttClientPrivate::sendPing()
 {
+    qCDebug(module) << "Sending ping.";
     if (m_pongReceived) {
         m_pongReceived = false;
         QMqttPingReqControlPacket packet;
@@ -301,6 +306,7 @@ void QMqttClientPrivate::sendPing()
  */
 void QMqttClientPrivate::onPongReceived()
 {
+    qCDebug(module) << "Received pong.";
     m_pongReceived = true;
 }
 
@@ -309,6 +315,8 @@ void QMqttClientPrivate::onPongReceived()
  */
 void QMqttClientPrivate::onSocketConnected()
 {
+    qCDebug(module) << "WebSockets successfully connected.";
+
     QMqttConnectControlPacket packet(m_clientId);
     packet.setWill(m_will);
     m_webSocket->sendBinaryMessage(packet.encode());
@@ -509,7 +517,7 @@ void QMqttClientPrivate::makeSignalSlotConnections()
     QObject::connect(m_packetParser.data(), &QMqttPacketParser::pong,
                      this, &QMqttClientPrivate::onPongReceived, Qt::QueuedConnection);
 
-    //forward parser errors to AWS IoT Client
+    //forward parser errors to user of QMqttClient
     QObject::connect(m_packetParser.data(), &QMqttPacketParser::error,
                      q, &QMqttClient::error, Qt::QueuedConnection);
 
@@ -522,10 +530,11 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
  */
-QMqttClient::QMqttClient(const QString &clientId, const QMqttWill &will, QObject *parent) :
+QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
     QObject(parent),
-    d_ptr(new QMqttClientPrivate(clientId, will, this))
+    d_ptr(new QMqttClientPrivate(clientId, this))
 {
+    qRegisterMetaType<QMqttProtocol::State>("QMqttProtocol::State");
 }
 
 /*!
@@ -550,11 +559,11 @@ QMqttClient::~QMqttClient()
 
   \sa disconnect(), stateChanged()
  */
-void QMqttClient::connect(const QMqttNetworkRequest &request)
+void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
 {
     Q_D(QMqttClient);
 
-    d->connect(request);
+    d->connect(request, will);
 }
 
 /*!
