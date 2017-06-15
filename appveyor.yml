@@ -21,9 +21,9 @@ environment:
     QT_COMPILED: msvc2015
     
   - VS_VERSION: Visual Studio 14 2015
-    QT_VERSION: 5.7
+    QT_VERSION: 5.9
     QT_COMPILED: msvc2015
-  
+
 before_build:
   - if "%platform%" == "x64" set VS_FULL=%VS_VERSION% Win64
   - if "%platform%" == "x64" set QTDIR=C:\Qt\%QT_VERSION%\%QT_COMPILED%_64
