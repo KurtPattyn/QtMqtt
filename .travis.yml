@@ -44,7 +44,7 @@ install:
     else
       brew update > /dev/null
       brew tap homebrew/versions
-      brew install qt@5.9
+      brew install qt
     fi
 
 before_script:
