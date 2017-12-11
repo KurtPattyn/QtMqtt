@@ -38,13 +38,13 @@ install:
   ############################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      sudo apt-add-repository -y ppa:beineri/opt-qt59-trusty
+      sudo apt-add-repository -y ppa:beineri/opt-qt593-trusty
       sudo apt-get -qq update
       sudo apt-get -qq install qt59tools qt59websockets
     else
       brew update > /dev/null
       brew tap homebrew/versions
-      brew install qt@5.9
+      brew install qt
     fi
 
 before_script:
