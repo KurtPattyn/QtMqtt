@@ -34,27 +34,26 @@ install:
     fi
     
   ############################################################################
-  # Install Qt5.6
+  # Install Qt5.9
   ############################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      sudo apt-add-repository -y ppa:beineri/opt-qt571-trusty
+      sudo apt-add-repository -y ppa:beineri/opt-qt593-trusty
       sudo apt-get -qq update
-      sudo apt-get -qq install qt57tools qt57websockets
+      sudo apt-get -qq install qt59tools qt59websockets
     else
       brew update > /dev/null
       brew tap homebrew/versions
-      brew install qt5
+      brew install qt
     fi
 
 before_script:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      export QTDIR="/opt/qt57"
+      export QTDIR="/opt/qt59"
       export PATH="$QTDIR/bin:$PATH"
-      qt57-env.sh
+      qt59-env.sh
     else
-      #export QTDIR="/usr/local/Cellar/qt5/5.7.0"
       export QTDIR="/usr/local/opt/qt5"
       export PATH="$QTDIR/bin:$PATH"
     fi
