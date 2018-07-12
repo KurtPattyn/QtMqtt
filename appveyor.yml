@@ -1,10 +1,12 @@
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 platform: 
   - x64
   - x86
 
-configuration: Debug
+configuration:
+  - Debug
+  - Release
 
 environment:
   matrix:
@@ -23,6 +25,10 @@ environment:
   - VS_VERSION: Visual Studio 14 2015
     QT_VERSION: 5.9
     QT_COMPILED: msvc2015
+    
+  - VS_VERSION: Visual Studio 15 2017
+    QT_VERSION: 5.11
+    QT_COMPILED: msvc2017
 
 before_build:
   - if "%platform%" == "x64" set VS_FULL=%VS_VERSION% Win64
