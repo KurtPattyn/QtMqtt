@@ -41,27 +41,23 @@ install:
       sudo apt-add-repository -y ppa:beineri/opt-qt593-trusty
       sudo apt-get -qq update
       sudo apt-get -qq install qt59tools qt59websockets
-    else
-      brew update > /dev/null
-      brew tap homebrew/versions
-      brew install qt
-    fi
 
-before_script:
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
       export QTDIR="/opt/qt59"
       export PATH="$QTDIR/bin:$PATH"
       qt59-env.sh
     else
+      brew update > /dev/null
+      brew tap homebrew/versions
+      brew install qt
+
       export QTDIR="/usr/local/opt/qt5"
       export PATH="$QTDIR/bin:$PATH"
     fi
-    
+
+before_script:  
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build
   - cd build
-  - which cmake
   - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=${SHARED_LIBS} -DPRIVATE_TESTS_ENABLED=ON ..
 
 script:
