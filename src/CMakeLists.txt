@@ -33,6 +33,7 @@ add_library(${TARGET_NAME}
             ${${TARGET_NAME}_SOURCES}
             ${${TARGET_NAME}_PUBLIC_HEADERS}
             ${${TARGET_NAME}_PRIVATE_HEADERS})
+add_library(${PROJECT_NAME_PREFIX}${QT_MAJOR_VERSION_REQUIRED}::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
 # add the Qtlibraries to the list of linked libraries
 # the Qt libraries are added as PUBLIC, so that projects using this module will transitively
