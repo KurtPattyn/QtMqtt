@@ -1,37 +1,39 @@
 language: c++
 sudo: required
+dist: trusty
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+ 
+env: 
+  global:
+    - CTEST_OUTPUT_ON_FAILURE=True # Print output of failed unit test.
+
+  matrix:
+    - BUILD_TYPE=Debug
+      SHARED_LIBS=ON
+    - BUILD_TYPE=Release
+      SHARED_LIBS=ON
+    - BUILD_TYPE=Debug
+      SHARED_LIBS=OFF
+    - BUILD_TYPE=Release
+      SHARED_LIBS=OFF
 
 matrix:
-  include:
-    - os: osx
-      compiler: clang
-      env: SHARED_LIBS=ON
-    - os: osx
-      compiler: clang
-      env: SHARED_LIBS=OFF
+  exclude:
     - os: linux
-      dist: trusty
+      compiler: clang
+    - os: osx
       compiler: gcc
-      env: SHARED_LIBS=ON
-    - os: linux
-      dist: trusty
-      compiler: gcc
-      env: SHARED_LIBS=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
-  ############################################################################
-  # Install a recent CMake (unless already installed on OS X)
-  ############################################################################
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="http://www.cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
-      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
-      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-    else
-      if ! brew ls --version cmake &>/dev/null; then brew install cmake; fi
-    fi
     
   ############################################################################
   # Install Qt5.9
@@ -41,29 +43,26 @@ install:
       sudo apt-add-repository -y ppa:beineri/opt-qt593-trusty
       sudo apt-get -qq update
       sudo apt-get -qq install qt59tools qt59websockets
-    else
-      brew update > /dev/null
-      brew tap homebrew/versions
-      brew install qt
-    fi
 
-before_script:
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
       export QTDIR="/opt/qt59"
       export PATH="$QTDIR/bin:$PATH"
       qt59-env.sh
     else
+      brew update > /dev/null
+      brew tap homebrew/versions
+      brew install qt
+
       export QTDIR="/usr/local/opt/qt5"
       export PATH="$QTDIR/bin:$PATH"
     fi
-    
+
+before_script:  
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build
   - cd build
-  - which cmake
   - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=${SHARED_LIBS} -DPRIVATE_TESTS_ENABLED=ON ..
 
 script:
-  - make
-  - make test
+  - cmake --build . --target all
+  - cmake --build . --target test
+

@@ -33,6 +33,7 @@ add_library(${TARGET_NAME}
             ${${TARGET_NAME}_SOURCES}
             ${${TARGET_NAME}_PUBLIC_HEADERS}
             ${${TARGET_NAME}_PRIVATE_HEADERS})
+add_library(${PROJECT_NAME_PREFIX}${QT_MAJOR_VERSION_REQUIRED}::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
 # add the Qtlibraries to the list of linked libraries
 # the Qt libraries are added as PUBLIC, so that projects using this module will transitively
@@ -51,7 +52,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 ##############################################
 
 # Add include directories of own project to include interface
-target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 # Create config file
 configure_package_config_file(cmake/config.cmake.in
