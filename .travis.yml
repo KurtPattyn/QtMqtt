@@ -61,5 +61,6 @@ before_script:
   - cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_SHARED_LIBS=${SHARED_LIBS} -DPRIVATE_TESTS_ENABLED=ON ..
 
 script:
-  - make
-  - make test
+  - cmake --build . --target all
+  - cmake --build . --target test
+
