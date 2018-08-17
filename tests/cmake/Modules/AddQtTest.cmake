@@ -8,6 +8,8 @@ macro(add_qt_test TEST_NAME SRCS)
     target_link_libraries(${TEST_NAME} PUBLIC Qt5::Test)
 endmacro()
 
+option(PRIVATE_TESTS_ENABLED "Private tests" OFF)
+
 macro(add_private_qt_test TEST_NAME SRCS)
     if(DEFINED PRIVATE_TESTS_ENABLED)
         if(${PRIVATE_TESTS_ENABLED})
