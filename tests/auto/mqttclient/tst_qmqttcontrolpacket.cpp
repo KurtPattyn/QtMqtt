@@ -2,7 +2,7 @@
 #include <QtTest/qtestcase.h>
 #include <QUrl>
 
-#include "private/qmqttcontrolpacket_p.h"
+#include "qmqttcontrolpacket_p.h"
 
 class tst_QMqttControlPacket: public QObject
 {

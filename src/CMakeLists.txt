@@ -52,7 +52,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 ##############################################
 
 # Add include directories of own project to include interface
-target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 # Create config file
 configure_package_config_file(cmake/config.cmake.in
