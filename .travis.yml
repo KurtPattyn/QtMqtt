@@ -1,22 +1,35 @@
 language: c++
 sudo: required
+dist: trusty
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+ 
+env: 
+  global:
+    - CTEST_OUTPUT_ON_FAILURE=True # Print output of failed unit test.
+
+  matrix:
+    - BUILD_TYPE=Debug
+      SHARED_LIBS=ON
+    - BUILD_TYPE=Release
+      SHARED_LIBS=ON
+    - BUILD_TYPE=Debug
+      SHARED_LIBS=OFF
+    - BUILD_TYPE=Release
+      SHARED_LIBS=OFF
 
 matrix:
-  include:
-    - os: osx
-      compiler: clang
-      env: SHARED_LIBS=ON
-    - os: osx
-      compiler: clang
-      env: SHARED_LIBS=OFF
+  exclude:
     - os: linux
-      dist: trusty
+      compiler: clang
+    - os: osx
       compiler: gcc
-      env: SHARED_LIBS=ON
-    - os: linux
-      dist: trusty
-      compiler: gcc
-      env: SHARED_LIBS=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
