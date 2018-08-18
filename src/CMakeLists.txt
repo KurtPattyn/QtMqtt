@@ -57,7 +57,7 @@ target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRE
 # Create config file
 configure_package_config_file(cmake/config.cmake.in
   ${CMAKE_BINARY_DIR}/${CMAKE_CONFIG_FILE_BASE_NAME}Config.cmake
-  INSTALL_DESTINATION ${CMAKE_BINARY_DIR}
+  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
   PATH_VARS INCLUDE_INSTALL_DIR
 )
 
