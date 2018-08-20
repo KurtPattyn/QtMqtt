@@ -5,8 +5,10 @@ macro(add_qt_test TEST_NAME SRCS)
 
     add_test(NAME tst_${TEST_NAME} COMMAND $<TARGET_FILE:${TEST_NAME}>)
 
-    target_link_libraries(${TEST_NAME} Qt5::Test)
+    target_link_libraries(${TEST_NAME} PUBLIC Qt5::Test)
 endmacro()
+
+option(PRIVATE_TESTS_ENABLED "Private tests" OFF)
 
 macro(add_private_qt_test TEST_NAME SRCS)
     if(DEFINED PRIVATE_TESTS_ENABLED)

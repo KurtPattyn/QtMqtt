@@ -33,6 +33,7 @@ add_library(${TARGET_NAME}
             ${${TARGET_NAME}_SOURCES}
             ${${TARGET_NAME}_PUBLIC_HEADERS}
             ${${TARGET_NAME}_PRIVATE_HEADERS})
+add_library(${PROJECT_NAME_PREFIX}${QT_MAJOR_VERSION_REQUIRED}::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
 # add the Qtlibraries to the list of linked libraries
 # the Qt libraries are added as PUBLIC, so that projects using this module will transitively
@@ -51,7 +52,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 ##############################################
 
 # Add include directories of own project to include interface
-target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 # Create config file
 configure_package_config_file(cmake/config.cmake.in
@@ -69,32 +70,24 @@ write_basic_package_version_file(
 
 # Create import targets
 install(TARGETS ${TARGET_NAME} EXPORT ${TARGET_NAME}Targets
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR}
-  PRIVATE_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR}/private
+  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}
+  PRIVATE_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/private
 )
 
 # Export the import targets
-export(EXPORT ${TARGET_NAME}Targets
-  FILE "${CMAKE_BINARY_DIR}/${CMAKE_CONFIG_FILE_BASE_NAME}Targets.cmake"
+install(EXPORT ${TARGET_NAME}Targets
+  FILE "${CMAKE_CONFIG_FILE_BASE_NAME}Targets.cmake"
   NAMESPACE ${PROJECT_NAMESPACE}::
+  DESTINATION ${CMAKE_INSTALL_DIR}
 )
 
 # Now install the 3 config files
 install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_CONFIG_FILE_BASE_NAME}Config.cmake
               ${CMAKE_BINARY_DIR}/${CMAKE_CONFIG_FILE_BASE_NAME}ConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_DIR}
-)
-
-install(EXPORT ${TARGET_NAME}Targets
-  FILE
-    ${CMAKE_CONFIG_FILE_BASE_NAME}Targets.cmake
-  NAMESPACE
-    ${PROJECT_NAMESPACE}::
-  DESTINATION
-    ${CMAKE_INSTALL_DIR}
 )
 
 # Create and install a global module include file
