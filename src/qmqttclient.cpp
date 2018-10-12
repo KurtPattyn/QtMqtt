@@ -141,8 +141,6 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
-
-    qCDebug(module) << "***************";
 }
 
 /*!
