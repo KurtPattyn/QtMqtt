@@ -130,7 +130,7 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
     m_clientId(clientId),
     m_pongReceived(false),
     m_pingTimer(),
-    m_pingIntervalMs(1200000), // 20 minutes
+    m_pingIntervalMs(30000), // 30 seconds
     m_webSocket(new QWebSocket),
     m_state(QMqttProtocol::State::OFFLINE),
     m_packetParser(new QMqttPacketParser),
@@ -141,6 +141,8 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
+
+    qCDebug(module) << "***************";
 }
 
 /*!
