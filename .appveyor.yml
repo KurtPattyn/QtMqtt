@@ -1,0 +1,34 @@
+image: Visual Studio 2017
+
+platform: 
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+environment:
+  matrix:  
+  - SHARED: ON
+  - SHARED: OFF
+
+  VS_VERSION: Visual Studio 15 2017
+  QT_VERSION: 5.11
+  QT_COMPILED: msvc2017
+
+install:
+  - set VS_FULL=%VS_VERSION% Win64
+  - set QTDIR=C:\Qt\%QT_VERSION%\%QT_COMPILED%_64
+  - set PATH=%PATH%;%QTDIR%\bin;
+
+before_build:
+  - cd /D %APPVEYOR_BUILD_FOLDER%
+  - mkdir build
+  - cd build
+  - cmake -G "%VS_FULL%" -DCMAKE_BUILD_TYPE=%configuration% -DBUILD_SHARED_LIBS=%SHARED% ..
+  
+build_script:
+  - cmake --build . --target ALL_BUILD --config %configuration%
+  
+test_script:
+  - cmake --build . --target RUN_TESTS --config %configuration%
