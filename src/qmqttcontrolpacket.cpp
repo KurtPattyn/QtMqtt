@@ -120,7 +120,7 @@ QMqttConnectControlPacket::QMqttConnectControlPacket(const QString &clientIdenti
     m_password(),
     m_will(),
     m_clean(true),
-    m_keepAlive(0),
+    m_keepAlive(30),
     m_clientIdentifier(clientIdentifier)
 {
     Q_ASSERT(clientIdentifier.length() < 24);
