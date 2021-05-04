@@ -35,6 +35,9 @@ public:
 
     void setState(QMqttProtocol::State newState);
 
+    QHostAddress localAddress() const;
+    quint16 localPort() const;
+
 private:
     QMqttClient * const q_ptr;
     const QString m_clientId;

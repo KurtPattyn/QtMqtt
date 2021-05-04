@@ -283,6 +283,23 @@ void QMqttClientPrivate::setState(QMqttProtocol::State newState)
 /*!
    \internal
  */
+QHostAddress QMqttClientPrivate::localAddress() const
+{
+    qInfo() << "socket info:" << m_webSocket->localAddress() << m_webSocket->peerAddress() << m_webSocket->state();
+    return m_webSocket->localAddress();
+}
+
+/*!
+   \internal
+ */
+quint16 QMqttClientPrivate::localPort() const
+{
+    return m_webSocket->localPort();
+}
+
+/*!
+   \internal
+ */
 void QMqttClientPrivate::sendPing()
 {
     qCDebug(module) << "Sending ping.";
@@ -674,3 +691,23 @@ void QMqttClient::publish(const QString &topic, const QByteArray &message,
     d->publish(topic, message, cb);
 }
 
+/*!
+ * Returns the local address
+ */
+QHostAddress QMqttClient::localAddress() const
+{
+    Q_D(const QMqttClient);
+
+
+    return d->localAddress();
+}
+
+/*!
+ * Returns the local port
+ */
+quint16 QMqttClient::localPort() const
+{
+    Q_D(const QMqttClient);
+
+    return d->localPort();
+}
