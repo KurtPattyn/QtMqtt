@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QHostAddress>
 #include <functional>
 #include "qmqttwill.h"
 #include "qmqttprotocol.h"
@@ -32,6 +33,9 @@ public:
     void unsubscribe(const QString &topic, std::function<void(bool)> cb);
     void publish(const QString &topic, const QByteArray &message);
     void publish(const QString &topic, const QByteArray &message, std::function<void(bool)> cb);
+
+    QHostAddress localAddress() const;
+    quint16 localPort() const;
 
 Q_SIGNALS:
     void stateChanged(QMqttProtocol::State);
