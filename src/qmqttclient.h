@@ -23,7 +23,7 @@ class QTMQTT_EXPORT QMqttClient : public QObject
     Q_DISABLE_COPY(QMqttClient)
 
 public:
-    QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QObject *parent = nullptr);
+    QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors = QSet<QSslError>(), QObject *parent = nullptr);
     virtual ~QMqttClient();
 
     using QObject::connect;
