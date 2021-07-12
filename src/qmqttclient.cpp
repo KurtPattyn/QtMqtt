@@ -124,7 +124,7 @@ void setImmediate(std::function<void()> f)
 /*!
    \internal
  */
-QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * const q) :
+QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QMqttClient * const q) :
     QObject(),
     q_ptr(q),
     m_clientId(clientId),
@@ -137,7 +137,8 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
     m_packetIdentifier(0),
     m_subscribeCallbacks(),
     m_will(),
-    m_signalSlotConnected(false)
+    m_signalSlotConnected(false),
+    m_allowedSslErrors(allowedSslErrors)
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
@@ -471,6 +472,29 @@ QString toString(const QList<QSslError> &sslErrors) {
     return sslErrorString;
 }
 
+
+/*!
+   \internal
+ */
+bool QMqttClientPrivate::sslErrorsAllowed(const QList<QSslError> &errors) const
+{
+    if (!m_allowedSslErrors.isEmpty())
+    {
+        QSet<QSslError> errorsSet;
+        for (const auto &error : errors)
+        {
+            errorsSet << QSslError(error.error());
+        }
+        QSet<QSslError> subtraction = errorsSet.subtract(m_allowedSslErrors);
+        if (subtraction.isEmpty())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /*!
    \internal
  */
@@ -487,6 +511,7 @@ void QMqttClientPrivate::makeSignalSlotConnections()
                      this, &QMqttClientPrivate::onSocketConnected, Qt::QueuedConnection);
     QObject::connect(m_webSocket.data(), &QWebSocket::disconnected,
                      [this, q]() {
+        qCDebug(module) << "Received QWebSocket::disconnected, close code" << m_webSocket->closeCode() << "close reason" << m_webSocket->closeReason();
         setState(QMqttProtocol::State::OFFLINE);
         Q_EMIT q->disconnected();
     });
@@ -494,9 +519,17 @@ void QMqttClientPrivate::makeSignalSlotConnections()
     typedef void (QWebSocket::* sslErrorsSignal)(const QList<QSslError> &);
     QObject::connect(m_webSocket.data(), static_cast<sslErrorsSignal>(&QWebSocket::sslErrors),
                      [this, q](const QList<QSslError> &errors) {
-        const QString errorMessage = QStringLiteral("SSL errors encountered: %1.").arg(toString(errors));
-        Q_EMIT q->error(QMqttProtocol::Error::CONNECTION_FAILED, errorMessage);
-        setState(QMqttProtocol::State::OFFLINE);
+        if (sslErrorsAllowed(errors))
+        {
+            qCDebug(module) << "Ignoring SSL errors" << errors;
+            m_webSocket->ignoreSslErrors();
+        }
+        else
+        {
+            const QString errorMessage = QStringLiteral("SSL errors encountered: %1.").arg(toString(errors));
+            Q_EMIT q->error(QMqttProtocol::Error::CONNECTION_FAILED, errorMessage);
+            setState(QMqttProtocol::State::OFFLINE);
+        }
     });
 
     typedef void (QWebSocket::* errorSignal)(QAbstractSocket::SocketError);
@@ -547,9 +580,9 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
  */
-QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
+QMqttClient::QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QObject *parent) :
     QObject(parent),
-    d_ptr(new QMqttClientPrivate(clientId, this))
+    d_ptr(new QMqttClientPrivate(clientId, allowedSslErrors, this))
 {
     qRegisterMetaType<QMqttProtocol::State>("QMqttProtocol::State");
 }

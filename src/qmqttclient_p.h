@@ -21,7 +21,7 @@ class QMqttClientPrivate : public QObject
     Q_DECLARE_PUBLIC(QMqttClient)
 
 public:
-    QMqttClientPrivate(const QString &clientId, QMqttClient * const q);
+    QMqttClientPrivate(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QMqttClient * const q);
     virtual ~QMqttClientPrivate();
 
     void connect(const QMqttNetworkRequest &request, const QMqttWill &will);
@@ -51,6 +51,7 @@ private:
     QMap<uint16_t, std::function<void(bool)>> m_subscribeCallbacks;
     QMqttWill m_will;
     bool m_signalSlotConnected;
+    const QSet<QSslError> m_allowedSslErrors;
 
 private Q_SLOTS:
     void onSocketConnected();
@@ -64,6 +65,7 @@ private Q_SLOTS:
     void onPongReceived();
 
 private: //helpers
+    bool sslErrorsAllowed(const QList<QSslError> &sslErrors) const;
     void makeSignalSlotConnections();
 
     void sendData(const QByteArray &data);
