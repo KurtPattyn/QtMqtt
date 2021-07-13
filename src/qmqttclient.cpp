@@ -490,7 +490,7 @@ bool QMqttClientPrivate::sslErrorsAllowed(const QList<QSslError> &errors) const
         {
             errorsSet << QSslError(error.error());
         }
-        QSet<QSslError> subtraction = errorsSet.subtract(m_allowedSslErrors);
+        const QSet<QSslError> subtraction = errorsSet.subtract(m_allowedSslErrors);
         if (subtraction.isEmpty())
         {
             return true;
