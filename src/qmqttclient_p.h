@@ -24,7 +24,7 @@ public:
     QMqttClientPrivate(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QMqttClient * const q);
     virtual ~QMqttClientPrivate();
 
-    void connect(const QMqttNetworkRequest &request, const QMqttWill &will);
+    void connect(const QMqttNetworkRequest &request, const QMqttWill &will, const QString &userName, const QByteArray &password);
     void disconnect();
     void subscribe(const QString &topic, QMqttProtocol::QoS qos, std::function<void(bool)> cb);
     void unsubscribe(const QString &topic, std::function<void (bool)> cb);
@@ -52,6 +52,8 @@ private:
     QMqttWill m_will;
     bool m_signalSlotConnected;
     const QSet<QSslError> m_allowedSslErrors;
+    QString m_userName;
+    QByteArray m_password;
 
 private Q_SLOTS:
     void onSocketConnected();

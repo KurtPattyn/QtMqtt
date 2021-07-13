@@ -138,7 +138,9 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QSet<QSslE
     m_subscribeCallbacks(),
     m_will(),
     m_signalSlotConnected(false),
-    m_allowedSslErrors(allowedSslErrors)
+    m_allowedSslErrors(allowedSslErrors),
+    m_userName(),
+    m_password()
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
@@ -154,13 +156,15 @@ QMqttClientPrivate::~QMqttClientPrivate()
 /*!
    \internal
  */
-void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
+void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will, const QString &userName, const QByteArray &password)
 {
     if (m_state != QMqttProtocol::State::OFFLINE) {
         qCWarning(module) << "Already connected.";
         return;
     }
     m_will = will;
+    m_userName = userName;
+    m_password = password;
     qCDebug(module) << "Connecting to Mqtt backend @ endpoint" << request.url();
     setState(QMqttProtocol::State::CONNECTING);
 
@@ -337,6 +341,7 @@ void QMqttClientPrivate::onSocketConnected()
 
     QMqttConnectControlPacket packet(m_clientId);
     packet.setWill(m_will);
+    packet.setCredentials(m_userName, m_password);
     m_webSocket->sendBinaryMessage(packet.encode());
 
     //TODO: initialize connection timeout
@@ -609,11 +614,11 @@ QMqttClient::~QMqttClient()
 
   \sa disconnect(), stateChanged()
  */
-void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
+void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will, const QString &userName, const QByteArray &password)
 {
     Q_D(QMqttClient);
 
-    d->connect(request, will);
+    d->connect(request, will, userName, password);
 }
 
 /*!

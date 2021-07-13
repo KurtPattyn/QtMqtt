@@ -27,7 +27,7 @@ public:
     virtual ~QMqttClient();
 
     using QObject::connect;
-    void connect(const QMqttNetworkRequest &request, const QMqttWill &will =  QMqttWill());
+    void connect(const QMqttNetworkRequest &request, const QMqttWill &will = QMqttWill(), const QString &userName = QString(), const QByteArray &password = QByteArray());
     using QObject::disconnect;
     void disconnect();
 
