@@ -491,14 +491,20 @@ bool QMqttClientPrivate::sslErrorsAllowed(const QList<QSslError> &errors) const
         // e.g. QSet({QSslError::HostNameMismatch, QSslError::SelfSignedCertificate, QSslError::SelfSignedCertificateInChain}),
         // the subtraction is never empty.
         // This is because the QSslErrors comparison operator compares both the error() and the certificate().
-        // If we construct a QSet<QSslError> with only the error() of the errors received with the QWebSocket::sslErrors signal,
-        // the subtraction is empty when needed.
+        // The comparison is empty when needed:
+        // 1. if we construct a QSet<QSslError> errorsSet with only the error() of the errors received with the QWebSocket::sslErrors signal
+        // 2. and if we construct a QSet<QSslError> allowedErrors with only the error() of m_allowedSslErrors
         QSet<QSslError> errorsSet;
         for (const auto &error : errors)
         {
             errorsSet << QSslError(error.error());
         }
-        const QSet<QSslError> subtraction = errorsSet.subtract(m_allowedSslErrors);
+        QSet<QSslError> allowedErrors;
+        for (const auto &allowedError : m_allowedSslErrors)
+        {
+            allowedErrors << QSslError(allowedError.error());
+        }
+        const QSet<QSslError> subtraction = errorsSet.subtract(allowedErrors);
         if (subtraction.isEmpty())
         {
             return true;
