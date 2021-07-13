@@ -584,6 +584,7 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   \a clientId should be a unique id representing the connection.
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
+  \a allowedSslErrors: specify any SSL errors you want to allow
  */
 QMqttClient::QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QObject *parent) :
     QObject(parent),
@@ -611,6 +612,10 @@ QMqttClient::~QMqttClient()
 
   During setup of the connection, the state of the client will change from DISCONNECTED over
   CONNECTING to CONNECTED.
+  \a userName: specify the userName to be used with connect; connect QMqttPublishControlPacket
+  does not contain this userName if it is empty
+  \a password: specify the password to be used with connect; connect QMqttPublishControlPacket
+  does not contain this password if it is null (use QByteArray() as a null password)
 
   \sa disconnect(), stateChanged()
  */
