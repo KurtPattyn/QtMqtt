@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QHostAddress>
+#include <QSet>
+#include <QSslError>
 #include <functional>
 #include "qmqttwill.h"
 #include "qmqttprotocol.h"
@@ -21,11 +23,11 @@ class QTMQTT_EXPORT QMqttClient : public QObject
     Q_DISABLE_COPY(QMqttClient)
 
 public:
-    QMqttClient(const QString &clientId, QObject *parent = nullptr);
+    QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors = QSet<QSslError>(), QObject *parent = nullptr);
     virtual ~QMqttClient();
 
     using QObject::connect;
-    void connect(const QMqttNetworkRequest &request, const QMqttWill &will =  QMqttWill());
+    void connect(const QMqttNetworkRequest &request, const QMqttWill &will = QMqttWill(), const QString &userName = QString(), const QByteArray &password = QByteArray());
     using QObject::disconnect;
     void disconnect();
 

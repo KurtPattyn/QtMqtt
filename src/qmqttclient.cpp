@@ -124,7 +124,7 @@ void setImmediate(std::function<void()> f)
 /*!
    \internal
  */
-QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * const q) :
+QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QMqttClient * const q) :
     QObject(),
     q_ptr(q),
     m_clientId(clientId),
@@ -137,7 +137,10 @@ QMqttClientPrivate::QMqttClientPrivate(const QString &clientId, QMqttClient * co
     m_packetIdentifier(0),
     m_subscribeCallbacks(),
     m_will(),
-    m_signalSlotConnected(false)
+    m_signalSlotConnected(false),
+    m_allowedSslErrors(allowedSslErrors),
+    m_userName(),
+    m_password()
 {
     Q_ASSERT(q);
     Q_ASSERT(!clientId.isEmpty());
@@ -153,13 +156,15 @@ QMqttClientPrivate::~QMqttClientPrivate()
 /*!
    \internal
  */
-void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
+void QMqttClientPrivate::connect(const QMqttNetworkRequest &request, const QMqttWill &will, const QString &userName, const QByteArray &password)
 {
     if (m_state != QMqttProtocol::State::OFFLINE) {
         qCWarning(module) << "Already connected.";
         return;
     }
     m_will = will;
+    m_userName = userName;
+    m_password = password;
     qCDebug(module) << "Connecting to Mqtt backend @ endpoint" << request.url();
     setState(QMqttProtocol::State::CONNECTING);
 
@@ -336,6 +341,7 @@ void QMqttClientPrivate::onSocketConnected()
 
     QMqttConnectControlPacket packet(m_clientId);
     packet.setWill(m_will);
+    packet.setCredentials(m_userName, m_password);
     m_webSocket->sendBinaryMessage(packet.encode());
 
     //TODO: initialize connection timeout
@@ -471,6 +477,43 @@ QString toString(const QList<QSslError> &sslErrors) {
     return sslErrorString;
 }
 
+
+/*!
+   \internal
+ */
+bool QMqttClientPrivate::sslErrorsAllowed(const QList<QSslError> &errors) const
+{
+    if (!m_allowedSslErrors.isEmpty())
+    {
+        // The QSslErrors received with the QWebSocket::sslErrors signal are probably defined with the QSslError constructor
+        // with a certificate QSslError::QSslError(QSslError::SslError error, const QSslCertificate &certificate)
+        // If m_allowedSslErrors is defined using the QSslError constructor without a certificate QSslError::QSslError(QSslError::SslError error),
+        // e.g. QSet({QSslError::HostNameMismatch, QSslError::SelfSignedCertificate, QSslError::SelfSignedCertificateInChain}),
+        // the subtraction is never empty.
+        // This is because the QSslErrors comparison operator compares both the error() and the certificate().
+        // The comparison is empty when needed:
+        // 1. if we construct a QSet<QSslError> errorsSet with only the error() of the errors received with the QWebSocket::sslErrors signal
+        // 2. and if we construct a QSet<QSslError> allowedErrors with only the error() of m_allowedSslErrors
+        QSet<QSslError> errorsSet;
+        for (const auto &error : errors)
+        {
+            errorsSet << QSslError(error.error());
+        }
+        QSet<QSslError> allowedErrors;
+        for (const auto &allowedError : m_allowedSslErrors)
+        {
+            allowedErrors << QSslError(allowedError.error());
+        }
+        const QSet<QSslError> subtraction = errorsSet.subtract(allowedErrors);
+        if (subtraction.isEmpty())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /*!
    \internal
  */
@@ -487,6 +530,7 @@ void QMqttClientPrivate::makeSignalSlotConnections()
                      this, &QMqttClientPrivate::onSocketConnected, Qt::QueuedConnection);
     QObject::connect(m_webSocket.data(), &QWebSocket::disconnected,
                      [this, q]() {
+        qCDebug(module) << "Received QWebSocket::disconnected, close code" << m_webSocket->closeCode() << "close reason" << m_webSocket->closeReason();
         setState(QMqttProtocol::State::OFFLINE);
         Q_EMIT q->disconnected();
     });
@@ -494,9 +538,17 @@ void QMqttClientPrivate::makeSignalSlotConnections()
     typedef void (QWebSocket::* sslErrorsSignal)(const QList<QSslError> &);
     QObject::connect(m_webSocket.data(), static_cast<sslErrorsSignal>(&QWebSocket::sslErrors),
                      [this, q](const QList<QSslError> &errors) {
-        const QString errorMessage = QStringLiteral("SSL errors encountered: %1.").arg(toString(errors));
-        Q_EMIT q->error(QMqttProtocol::Error::CONNECTION_FAILED, errorMessage);
-        setState(QMqttProtocol::State::OFFLINE);
+        if (sslErrorsAllowed(errors))
+        {
+            qCDebug(module) << "Ignoring SSL errors" << errors;
+            m_webSocket->ignoreSslErrors();
+        }
+        else
+        {
+            const QString errorMessage = QStringLiteral("SSL errors encountered: %1.").arg(toString(errors));
+            Q_EMIT q->error(QMqttProtocol::Error::CONNECTION_FAILED, errorMessage);
+            setState(QMqttProtocol::State::OFFLINE);
+        }
     });
 
     typedef void (QWebSocket::* errorSignal)(QAbstractSocket::SocketError);
@@ -546,10 +598,11 @@ void QMqttClientPrivate::makeSignalSlotConnections()
   \a clientId should be a unique id representing the connection.
   The length of the \a clientId should be larger than smaller than 24 characters.
   If an empty \a clientId is provided, the server will generate a random one.
+  \a allowedSslErrors: specify any SSL errors you want to allow
  */
-QMqttClient::QMqttClient(const QString &clientId, QObject *parent) :
+QMqttClient::QMqttClient(const QString &clientId, const QSet<QSslError> &allowedSslErrors, QObject *parent) :
     QObject(parent),
-    d_ptr(new QMqttClientPrivate(clientId, this))
+    d_ptr(new QMqttClientPrivate(clientId, allowedSslErrors, this))
 {
     qRegisterMetaType<QMqttProtocol::State>("QMqttProtocol::State");
 }
@@ -573,14 +626,18 @@ QMqttClient::~QMqttClient()
 
   During setup of the connection, the state of the client will change from DISCONNECTED over
   CONNECTING to CONNECTED.
+  \a userName: specify the userName to be used with connect; connect QMqttPublishControlPacket
+  does not contain this userName if it is empty
+  \a password: specify the password to be used with connect; connect QMqttPublishControlPacket
+  does not contain this password if it is null (use QByteArray() as a null password)
 
   \sa disconnect(), stateChanged()
  */
-void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will)
+void QMqttClient::connect(const QMqttNetworkRequest &request, const QMqttWill &will, const QString &userName, const QByteArray &password)
 {
     Q_D(QMqttClient);
 
-    d->connect(request, will);
+    d->connect(request, will, userName, password);
 }
 
 /*!
