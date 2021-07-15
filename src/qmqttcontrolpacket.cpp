@@ -129,6 +129,7 @@ QMqttConnectControlPacket::QMqttConnectControlPacket(const QString &clientIdenti
 void QMqttConnectControlPacket::setCredentials(const QString &userName, const QByteArray &password)
 {
     Q_ASSERT(!userName.isEmpty());
+    Q_ASSERT(!password.isNull());
     m_userName = userName;
     m_password = password;
 }

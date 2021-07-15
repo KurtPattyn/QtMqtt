@@ -341,7 +341,10 @@ void QMqttClientPrivate::onSocketConnected()
 
     QMqttConnectControlPacket packet(m_clientId);
     packet.setWill(m_will);
-    packet.setCredentials(m_userName, m_password);
+    if (!m_userName.isEmpty() && !m_password.isNull())
+    {
+        packet.setCredentials(m_userName, m_password);
+    }
     m_webSocket->sendBinaryMessage(packet.encode());
 
     //TODO: initialize connection timeout
